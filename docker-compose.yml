@@ -1,0 +1,42 @@
+services:
+  registry:
+    image: registry:latest
+    container_name: docker-registry
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - registry-data:/var/lib/registry
+    environment:
+      - REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY=/var/lib/registry
+    networks:
+      - autodeploy-network
+
+  auto-updater:
+    build:
+      context: .
+      dockerfile: Dockerfile.updater
+    container_name: auto-updater
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./auto-updater.py:/app/auto-updater.py:ro
+    environment:
+      - POLL_INTERVAL=30
+      - REGISTRY_URL=localhost:5000
+      - CLEANUP=true
+      - TRACK_SYSTEM_CONTAINERS=true
+      - SYSTEM_CONTAINERS=docker-registry
+    networks:
+      - autodeploy-network
+    depends_on:
+      - registry
+
+volumes:
+  registry-data:
+    driver: local
+
+networks:
+  autodeploy-network:
+    driver: bridge
+

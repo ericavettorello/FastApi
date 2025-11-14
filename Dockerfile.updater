@@ -1,0 +1,15 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Установка Docker SDK для Python
+RUN pip install --no-cache-dir docker
+
+# Копирование скрипта обновления
+COPY auto-updater.py /app/auto-updater.py
+
+# Установка прав на выполнение
+RUN chmod +x /app/auto-updater.py
+
+CMD ["python3", "/app/auto-updater.py"]
+
