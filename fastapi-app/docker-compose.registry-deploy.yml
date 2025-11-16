@@ -1,0 +1,17 @@
+# Docker Compose для деплоя с Registry
+services:
+  fastapi-app:
+    image: localhost:5000/fastapi-app:latest
+    container_name: fastapi-app
+    ports:
+      - "8002:8002"
+    environment:
+      - PORT=8002
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
